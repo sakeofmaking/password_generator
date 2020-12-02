@@ -19,7 +19,7 @@ logging.basicConfig(format="%(asctime)s: %(message)s", level=logging.INFO, datef
 
 
 def scrap_url(url):
-    """Scrap a url and return html text"""
+    """Scrap url, decode, return html"""
     page = urlopen(url)
     html_bytes = page.read()
     html = html_bytes.decode("utf-8")
@@ -71,8 +71,14 @@ def find_phrase(password_len: int):
     # Extract book text
     book_text = scrap_url(book_txt_url)
 
+    # Skip book text intro
+    pattern = r"(\*\*\*.*\*\*\*)"
+    result = re.search(pattern, book_text)
+    index = book_text.find(result[1])
+    index += len(result[1])
+
     # Search book text word by word
-    return word_by_word(book_text, password_len)
+    return word_by_word(book_text[index:], password_len)
 
 
 def encrypt_text(text):
